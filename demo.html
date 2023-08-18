@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+        }
+
+        form {
+            width: 50%;
+            border-right: 2px solid #ccc;
+            padding: 20px;
+        }
+
+        #userInputDisplay {
+            width: 50%;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* Optional: Style for the user input display section */
+        #userInputDisplay p {
+            margin: 0;
+            padding: 5px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        #selectedFileDisplay {
+            margin-top: 20px;
+        }
+
+        img {
+            max-width: 50%;
+            max-height: 50%;
+            display: block;
+            margin: 10px auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <form>
+        <div>
+            <label for="discussion">Discussion:</label>
+        </div>
+
+        <div>
+            <textarea name="dis" id="discussionInput" cols="30" rows="10" placeholder="Discussion "></textarea><br>
+            <input type="submit">
+        </div>
+
+        <p>
+            <div>
+                <label for="ques">Drop Your Question:</label><br>
+                <input type="file" id="fileInput">
+            </div>
+        </p>
+    </form>
+
+    <!-- Add a container to display the user's input and selected file on the right side -->
+    <div id="userInputDisplay"></div>
+
+    <script>
+        // Get references to the elements
+        const discussionInput = document.getElementById('discussionInput');
+        const userInputDisplay = document.getElementById('userInputDisplay');
+        const fileInput = document.getElementById('fileInput');
+        const form = document.querySelector('form');
+
+        // Array to store all user responses (text and file)
+        const responses = [];
+
+        // Add event listener to capture the user's text input when form is submitted
+        form.addEventListener('submit', (event) => {
+            event.preventDefault(); // Prevent form submission and page reload
+            const userInput = discussionInput.value.trim(); // Remove leading and trailing whitespace
+            if (userInput !== '') {
+                responses.unshift(userInput); // Add the text input to the beginning of the array
+                displayResponses(); // Display all the responses
+                discussionInput.value = ''; // Clear the textarea for new input
+            }
+        });
+
+        // Add event listener to show the selected file on the right side
+        fileInput.addEventListener('change', () => {
+            const selectedFile = fileInput.files[0];
+            displaySelectedFile(selectedFile);
+        });
+
+        // Function to display all user responses
+        function displayResponses() {
+            userInputDisplay.innerHTML = ''; // Clear the display
+
+            // Display all responses
+            for (const response of responses) {
+                const responseElement = document.createElement('p');
+                if (response instanceof HTMLElement) {
+                    // If the response is an HTML element (file response), append it directly
+                    responseElement.appendChild(response);
+                } else {
+                    // If the response is text, set its textContent
+                    responseElement.textContent = response;
+                }
+                userInputDisplay.appendChild(responseElement);
+            }
+        }
+
+        // Function to display the selected file on the right side
+        function displaySelectedFile(file) {
+            if (file) {
+                if (file.type.startsWith('image/')) {
+                    // If the selected file is an image, display it as an image
+                    const imageElement = document.createElement('img');
+                    imageElement.src = URL.createObjectURL(file);
+                    responses.unshift(imageElement); // Add the image element to the beginning of the array
+                } else {
+                    // If it's not an image, display the file name
+                    const fileNameElement = document.createElement('span');
+                    fileNameElement.textContent = `Selected File: ${file.name}`;
+                    responses.unshift(fileNameElement); // Add the file name element to the beginning of the array
+                }
+
+                displayResponses(); // Display all the responses (including the new file response)
+            }
+        }
+    </script>
+
+</body>
+
+</html>
